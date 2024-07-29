@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prediction</title>
+    <style>
+        #drop-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+        }
+        #drop-area.hover {
+            border-color: #333;
+        }
+        #image-preview {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Prediction</h1>
+    <div id="drop-area">
+        <p>Drag & Drop your image here or click to select a file</p>
+        <input type="file" id="file-input" accept="image/*" style="display: none;">
+        <div id="image-preview"></div>
+    </div>
+    <button id="send-button">Send</button>
+    <button id="clear-button">Clear</button>
+    <p id="result"></p>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+        const sendButton = document.getElementById('send-button');
+        const clearButton = document.getElementById('clear-button');
+        const result = document.getElementById('result');
+        let selectedFile;
+
+        dropArea.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropArea.classList.add('hover');
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('hover');
+        });
+
+        dropArea.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropArea.classList.remove('hover');
+            handleFile(event.dataTransfer.files[0]);
+        });
+
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            handleFile(event.target.files[0]);
+        });
+
+        sendButton.addEventListener('click', () => {
+            if (selectedFile) {
+                sendFile(selectedFile);
+            } else {
+                alert('Please select an image first.');
+            }
+        });
+
+        clearButton.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            imagePreview.innerHTML = '';
+            result.textContent = '';
+        });
+
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.innerHTML = `<img src="${event.target.result}" alt="Image Preview" width="200">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file.');
+            }
+        }
+
+        function sendFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://ec2-52-91-21-90.compute-1.amazonaws.com:8000/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                result.textContent = `Prediction: ${data.prediction}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                result.textContent = 'An error occurred.';
+            });
+        }
+    </script>
+</body>
+</html>

@@ -93,7 +93,7 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            fetch('http://ec2-52-91-21-90.compute-1.amazonaws.com:8000/predict', {
+            fetch('http://ageapi.ikey.ie/predict', {
                 method: 'POST',
                 body: formData
             })

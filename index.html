@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Prediction</title>
+    <title>Fundus Image Age Predictor</title>
     <style>
         #drop-area {
             border: 2px dashed #ccc;
@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <h1>Image Prediction</h1>
+    <h1>Fundus Image Age Predictor</h1>
     <div id="drop-area">
         <p>Drag & Drop your image here or click to select a file</p>
         <input type="file" id="file-input" accept="image/*" style="display: none;">
@@ -82,6 +82,7 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     imagePreview.innerHTML = `<img src="${event.target.result}" alt="Image Preview" width="200">`;
+                    result.textContent = ''; // Clear the result when a new image is loaded
                 };
                 reader.readAsDataURL(file);
             } else {
